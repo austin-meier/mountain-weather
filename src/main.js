@@ -30,10 +30,19 @@ const cToF = (celsius) => {
 
 const kphToMph = (kph) => kph * 0.621371;
 
+const metersToFeet = (meters) => meters * 3.28084;
+
 const changeTemp = () => {
-  [...document.querySelectorAll(".temp-value")].forEach((ele) => {
-    const temp = Number(ele.textContent);
-    ele.textContent = cToF(temp).toFixed(1);
+  [...document.querySelectorAll("div .temp-value")].forEach((ele) => {
+    if (ele.tagName === "DIV") {
+      const temp = Number(ele.textContent);
+      ele.textContent = cToF(temp).toFixed(1);
+    } else {
+      // It's a SVG group tag
+      let t = ele.querySelector("text");
+      const temp = Number(t.textContent);
+      t.innerHTML = Math.round(cToF(temp));
+    }
   });
   [...document.querySelectorAll(".tempu")].forEach((ele) => {
     ele.textContent = "F";
@@ -51,8 +60,27 @@ const changeWind = () => {
   });
 };
 
+const changeAltitude = () => {
+  [...document.querySelectorAll(".level-value")].forEach((ele) => {
+    const meters = Number(ele.textContent);
+    const ft = Math.round(metersToFeet(meters));
+    ele.textContent = ft;
+  });
+
+  [...document.querySelectorAll(".flscale-unit")].forEach((ele) => {
+    const meters = Number(ele.textContent.slice(0, -1));
+    const ft = Math.round(metersToFeet(meters));
+    ele.textContent = ft + "ft";
+  });
+
+  [...document.querySelectorAll(".heightu")].forEach((ele) => {
+    ele.textContent = "ft";
+  });
+};
+
 getWeatherDiv().then((data) => {
   document.querySelector("#forecast").insertAdjacentHTML("afterbegin", data);
   changeTemp();
   changeWind();
+  changeAltitude();
 });
